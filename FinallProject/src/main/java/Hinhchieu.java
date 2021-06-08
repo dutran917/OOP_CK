@@ -25,9 +25,13 @@ public class Hinhchieu extends javax.swing.JFrame {
     ArrayList<Obstacle> listvat;
     Room r;
     ArrayList<Area> areavLtoR = new ArrayList<Area>();
-    ArrayList<Area> areavRtoL = new ArrayList<Area>();    
+    ArrayList<Area> areavRtoL = new ArrayList<Area>();
+    ArrayList<Area> areavFtoB = new ArrayList<Area>(); 
+    ArrayList<Area> areavBtoF = new ArrayList<Area>();    
     Area areacLtoR = new Area();
     Area areacRtoL = new Area();
+    Area areacFtoB = new Area();
+    Area areacBtoF = new Area();
     public Hinhchieu(Room r, ArrayList<Camera> listcam,ArrayList<Obstacle> listvat){
         this.r = r;
         this.listcam = listcam;
@@ -131,39 +135,39 @@ public class Hinhchieu extends javax.swing.JFrame {
 
     private void jButton2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton2MouseClicked
         // TODO add your handling code here:
-        r.setLength(r.getLength()*20);
-        r.setWidth(r.getWidth()*20);
-        r.setHeight(r.getHeight()*20);
-        JFrame cam = new JFrame();
-        cam.setSize(600,600);
+        Room newroom = new Room(r.getLength(),r.getWidth(),r.getHeight());
+        newroom.setLength(r.getLength()*20);
+        newroom.setWidth(r.getWidth()*20);
+        newroom.setHeight(r.getHeight()*20); 
         for(Camera t: listcam)
         {
-            t.setX(t.getX()*20);
-            t.setY(t.getY()*20);
-            t.setZ(t.getZ()*20);
-            if(t.getWall() == 1)
+            Camera newcam = new Camera(t.getX(),t.getY(),t.getZ(),t.getAngle1(),t.getAngle2(),r);
+            newcam.setX(t.getX()*20);
+            newcam.setY(t.getY()*20);
+            newcam.setZ(t.getZ()*20);
+            if(newcam.getWall() == 1)
             {
-                point cam_hc = new point(r.getLength(),t.getY(),t.getZ());
-                point hc1 = new point(r.getLength(),t.getY()-r.getLength()*Math.tan(Math.toRadians(t.getAngle1()/2)),t.getZ());
-                point hc2 = new point(r.getLength(),t.getY(),t.getZ() - r.getLength()*Math.tan(Math.toRadians(t.getAngle2()/2)));
+                point cam_hc = new point(newroom.getLength(),newcam.getY(),newcam.getZ());
+                point hc1 = new point(newroom.getLength(),newcam.getY()-newroom.getLength()*Math.tan(Math.toRadians(newcam.getAngle1()/2)),newcam.getZ());
+                point hc2 = new point(newroom.getLength(),newcam.getY(),newcam.getZ() - newroom.getLength()*Math.tan(Math.toRadians(newcam.getAngle2()/2)));
                 point td = new point((hc1.getX()+hc2.getX())/2,(hc1.getY()+hc2.getY())/2,(hc1.getZ()+hc2.getZ())/2);
 
                 point diemdau = new point(2*td.getX()-cam_hc.getX(),2*td.getY()-cam_hc.getY(),2*td.getZ()-cam_hc.getZ());
-                double w = r.getLength()*Math.tan(Math.toRadians(t.getAngle1())/2) * 2;
-                double h = r.getLength()*Math.tan(Math.toRadians(t.getAngle2())/2) * 2;
-//                System.out.println(r.getLength()+" "+r.getWidth()+" "+r.getHeight());
+                double w = newroom.getLength()*Math.tan(Math.toRadians(newcam.getAngle1())/2) * 2;
+                double h = newroom.getLength()*Math.tan(Math.toRadians(newcam.getAngle2())/2) * 2;
+//                System.out.println(newroom.getLength()+" "+newroom.getWidth()+" "+newroom.getHeight());
 
                 Area camera = new Area(new Rectangle2D.Double(diemdau.getY(), diemdau.getZ(), w, h));
                 areacLtoR = camera;
                 Area cam_tmp =(Area) camera.clone();
-                point cam_p = new point(t.getX(),t.getY(),t.getZ());
+                point cam_p = new point(newcam.getX(),newcam.getY(),newcam.getZ());
 
                 for(Obstacle vat: listvat)
                 {
                     point pa = new point(vat.getBottom1().get(0)*20,vat.getBottom1().get(1)*20,vat.getBottom1().get(2)*20);
                     point pb = new point();
 
-                    pb.setX(r.getLength());
+                    pb.setX(newroom.getLength());
                     double k = (pa.getX()-cam_p.getX())/(pb.getX()-cam_p.getX());
 
                     pb.setY((((pa.getY()-cam_p.getY())/k)+cam_p.getY()));
@@ -174,7 +178,7 @@ public class Hinhchieu extends javax.swing.JFrame {
                     double w_hc = w1/k *20;
                     double h_hc = h1/k *20;
                     
-                    point dx = new point(r.getLength(),pb.getY(),r.getHeight()/2);
+                    point dx = new point(newroom.getLength(),pb.getY(),newroom.getHeight()/2);
                     point dx1 = new point(2*dx.getX()-pb.getX(),2*dx.getY()-pb.getY(),2*dx.getZ()-pb.getZ());
                     System.out.println(dx1.getX()+" "+dx1.getY()+" "+dx1.getZ());
                     areavLtoR.add(new Area(new Rectangle2D.Double(dx1.getY(), dx1.getZ()-h_hc, w_hc, h_hc)));
@@ -187,8 +191,10 @@ public class Hinhchieu extends javax.swing.JFrame {
             }
         
         }
-       cam.setTitle("Camera");
-       cam.setLocationRelativeTo(null);
+        JFrame cam = new JFrame();
+        cam.setSize(600,600);
+        cam.setTitle("Camera");
+        cam.setLocationRelativeTo(null);
        if(areavLtoR.size()!=0)
        {
            CamLtoR g1 = new CamLtoR(areavLtoR,areacLtoR);
@@ -200,53 +206,59 @@ public class Hinhchieu extends javax.swing.JFrame {
            JOptionPane.showMessageDialog(cam,"There is no camera on this wall!","No Camera",JOptionPane.WARNING_MESSAGE);
            System.out.println("ko co cam");
        }
-       areavLtoR.clear();
-       areacLtoR = null;
+//       areavLtoR.removeAll(areavLtoR);
+//       areacLtoR = null;
     }//GEN-LAST:event_jButton2MouseClicked
 
     private void jButton3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton3MouseClicked
         // TODO add your handling code here:
-        r.setLength(r.getLength()*20);
-        r.setWidth(r.getWidth()*20);
-        r.setHeight(r.getHeight()*20);
- 
+        Room newroom = new Room(r.getLength(),r.getWidth(),r.getHeight());
+        newroom.setLength(r.getLength()*20);
+        newroom.setWidth(r.getWidth()*20);
+        newroom.setHeight(r.getHeight()*20); 
+//        for(Camera t: listcam)
+//        {
+//            t.setX(t.getX()*20);
+//            t.setY(t.getY()*20);
+//            t.setZ(t.getZ()*20);
+//        }
         for(Camera t: listcam)
         {
-            t.setX(t.getX()*20);
-            t.setY(t.getY()*20);
-            t.setZ(t.getZ()*20);
-            if(t.getWall() == 3)
+            Camera newcam = new Camera(t.getX(),t.getY(),t.getZ(),t.getAngle1(),t.getAngle2(),r);
+            newcam.setX(t.getX()*20);
+            newcam.setY(t.getY()*20);
+            newcam.setZ(t.getZ()*20);
+            if(newcam.getWall() == 3)
             {
-                point cam_hc = new point(0,t.getY(),t.getZ());
-                point hc1 = new point(0,t.getY()-r.getLength()*Math.tan(Math.toRadians(t.getAngle1()/2)),t.getZ());
-                point hc2 = new point(0,t.getY(),t.getZ() - r.getLength()*Math.tan(Math.toRadians(t.getAngle2()/2)));
+                point cam_hc = new point(0,newcam.getY(),newcam.getZ());
+                point hc1 = new point(0,newcam.getY()-newroom.getLength()*Math.tan(Math.toRadians(newcam.getAngle1())/2),newcam.getZ());
+                point hc2 = new point(0,newcam.getY(),newcam.getZ() - newroom.getLength()*Math.tan(Math.toRadians(newcam.getAngle2())/2));
                 point td = new point((hc1.getX()+hc2.getX())/2,(hc1.getY()+hc2.getY())/2,(hc1.getZ()+hc2.getZ())/2);
                 System.out.println(td.getY() +" "+ td.getZ());
                 point diemdau = new point(2*td.getX()-cam_hc.getX(),2*td.getY()-cam_hc.getY(),2*td.getZ()-cam_hc.getZ());
-                double w = r.getLength()*Math.tan(Math.toRadians(t.getAngle1())/2) * 2;
-                double h = r.getLength()*Math.tan(Math.toRadians(t.getAngle2())/2) * 2;
+                double w = newroom.getLength()*Math.tan(Math.toRadians(newcam.getAngle1())/2) * 2;
+                double h = newroom.getLength()*Math.tan(Math.toRadians(newcam.getAngle2())/2) * 2;
                 Area camera = new Area(new Rectangle2D.Double(diemdau.getY(), diemdau.getZ(), w, h));
                 areacRtoL = camera;
-                Area cam_tmp =(Area) camera.clone();
-                point cam_p = new point(t.getX(),t.getY(),t.getZ());
+                point cam_p = new point(newcam.getX(),newcam.getY(),newcam.getZ());
                 
                 for(Obstacle vat: listvat)
                 {
                     point pa = new point(vat.getBottom2().get(0)*20,vat.getBottom2().get(1)*20,vat.getBottom2().get(2)*20);
                     point pb = new point();
-
+                    System.out.println(pa.getX()+" "+pa.getY()+" "+pa.getZ());
                     pb.setX(0);
                     double k = (pa.getX()-cam_p.getX())/(pb.getX()-cam_p.getX());
-
+                    System.out.println("k = "+k);
                     pb.setY((((pa.getY()-cam_p.getY())/k)+cam_p.getY()));
                     pb.setZ((((pa.getZ()-cam_p.getZ())/k)+cam_p.getZ()));
-                    
+                    System.out.println(pb.getX()+" "+pb.getY()+" "+pb.getZ());
                     double w1 = Math.abs(vat.getBottom3().get(1) - vat.getBottom2().get(1));
                     double h1 = Math.abs(vat.getTop1().get(2) - vat.getBottom1().get(2));
                     double w_hc = w1/k *20;
                     double h_hc = h1/k *20;
                     
-                    point dx = new point(0,pb.getY(),r.getHeight()/2);
+                    point dx = new point(0,pb.getY(),newroom.getHeight()/2);
 
                     point dx1 = new point(2*dx.getX()-pb.getX(),2*dx.getY()-pb.getY(),2*dx.getZ()-pb.getZ());
  
@@ -262,12 +274,19 @@ public class Hinhchieu extends javax.swing.JFrame {
         }
         
         JFrame cam = new JFrame();
+
        if(areavRtoL.size()!=0)
        {
+           System.out.println("RtoL");
+           cam.setVisible(true);
            CamRtoL g1 = new CamRtoL(areavRtoL,areacRtoL);
            cam.add(g1);
-           cam.setVisible(true);
+//           g1.areavat = new ArrayList<>();
+//           g1.areavat.addAll(areavRtoL);
+//           System.out.println(g1.areavat.size());
+//           g1.areacam = areacRtoL;
        }
+       
        else 
        {
            JOptionPane.showMessageDialog(cam,"There is no camera on this wall!","No Camera",JOptionPane.WARNING_MESSAGE);
@@ -276,30 +295,166 @@ public class Hinhchieu extends javax.swing.JFrame {
        cam.setSize(600,600);
         cam.setTitle("Camera");
         cam.setLocationRelativeTo(null);
-        areavRtoL.clear();
-        areacRtoL = null;
+//        areavRtoL.removeAll(areavRtoL);
+//        areacRtoL = null;
     }//GEN-LAST:event_jButton3MouseClicked
 
     private void jButton4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton4MouseClicked
         // TODO add your handling code here:
+        Room newroom = new Room(r.getLength(),r.getWidth(),r.getHeight());
+        newroom.setLength(r.getLength()*20);
+        newroom.setWidth(r.getWidth()*20);
+        newroom.setHeight(r.getHeight()*20); 
+
+        for(Camera t: listcam)
+        {
+            Camera newcam = new Camera(t.getX(),t.getY(),t.getZ(),t.getAngle1(),t.getAngle2(),r);
+            newcam.setX(t.getX()*20);
+            newcam.setY(t.getY()*20);
+            newcam.setZ(t.getZ()*20);
+            if(newcam.getWall() == 4)
+            {
+                point cam_hc = new point(newcam.getX(),0,newcam.getZ());
+                point hc1 = new point(newcam.getX()-newroom.getWidth()*Math.tan(Math.toRadians(newcam.getAngle1())/2),0,newcam.getZ());
+                point hc2 = new point(newcam.getX(),0,newcam.getZ() - newroom.getWidth()*Math.tan(Math.toRadians(newcam.getAngle2())/2));
+                point td = new point((hc1.getX()+hc2.getX())/2,(hc1.getY()+hc2.getY())/2,(hc1.getZ()+hc2.getZ())/2);
+                System.out.println(td.getX() +" "+ td.getZ());
+                point diemdau = new point(2*td.getX()-cam_hc.getX(),2*td.getY()-cam_hc.getY(),2*td.getZ()-cam_hc.getZ());
+                double w = newroom.getWidth()*Math.tan(Math.toRadians(newcam.getAngle1())/2) * 2;
+                double h = newroom.getWidth()*Math.tan(Math.toRadians(newcam.getAngle2())/2) * 2;
+                Area camera = new Area(new Rectangle2D.Double(diemdau.getY(), diemdau.getZ(), w, h));
+                areacFtoB = camera;
+                point cam_p = new point(newcam.getX(),newcam.getY(),newcam.getZ());
+                
+                for(Obstacle vat: listvat)
+                {
+                    point pa = new point(vat.getBottom4().get(0)*20,vat.getBottom4().get(1)*20,vat.getBottom4().get(2)*20);
+                    point pb = new point();
+                    System.out.println(pa.getX()+" "+pa.getY()+" "+pa.getZ());
+                    pb.setY(0);
+                    double k = (pa.getY()-cam_p.getY())/(pb.getY()-cam_p.getY());
+                    System.out.println("k = "+k);
+                    pb.setX((((pa.getX()-cam_p.getX())/k)+cam_p.getX()));
+                    pb.setZ((((pa.getZ()-cam_p.getZ())/k)+cam_p.getZ()));
+                    System.out.println(pb.getX()+" "+pb.getY()+" "+pb.getZ());
+                    double w1 = Math.abs(vat.getBottom3().get(0) - vat.getBottom4().get(0));
+                    double h1 = Math.abs(vat.getTop1().get(2) - vat.getBottom1().get(2));
+                    double w_hc = w1/k *20;
+                    double h_hc = h1/k *20;
+                    
+                    point dx = new point(pb.getX(),0,newroom.getHeight()/2);
+
+                    point dx1 = new point(2*dx.getX()-pb.getX(),2*dx.getY()-pb.getY(),2*dx.getZ()-pb.getZ());
+                    System.out.println(dx1.getX() +" "+ dx1.getY()+" "+ dx1.getZ()+" "+w_hc+" "+h_hc);
+                    areavFtoB.add(new Area(new Rectangle2D.Double(dx1.getX(), dx1.getZ()-h_hc, w_hc, h_hc)));
+
+
+//                    break;
+                }
+//                System.out.println(y +" "+z);
+                
+            }
+        }
         JFrame cam = new JFrame();
-        CamFtoB g1 = new CamFtoB();
-        cam.setSize(800, 800);
+        if(areavFtoB.size()!=0)
+        {
+           System.out.println("FtoB");
+           cam.setVisible(true);
+           CamFtoB g1 = new CamFtoB(areavFtoB,areacFtoB);
+           cam.add(g1);
+//           g1.areavat = new ArrayList<>();
+//           g1.areavat.addAll(areavRtoL);
+//           System.out.println(g1.areavat.size());
+//           g1.areacam = areacRtoL;
+       }
+       
+       else 
+       {
+           JOptionPane.showMessageDialog(cam,"There is no camera on this wall!","No Camera",JOptionPane.WARNING_MESSAGE);
+           System.out.println("ko co cam");
+       }
+       cam.setSize(800,600);
         cam.setTitle("Camera");
         cam.setLocationRelativeTo(null);
-        cam.add(g1);
-        cam.setVisible(true);
     }//GEN-LAST:event_jButton4MouseClicked
 
     private void jButton5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton5MouseClicked
         // TODO add your handling code here:
+        Room newroom = new Room(r.getLength(),r.getWidth(),r.getHeight());
+        newroom.setLength(r.getLength()*20);
+        newroom.setWidth(r.getWidth()*20);
+        newroom.setHeight(r.getHeight()*20); 
+
+        for(Camera t: listcam)
+        {
+            Camera newcam = new Camera(t.getX(),t.getY(),t.getZ(),t.getAngle1(),t.getAngle2(),r);
+            newcam.setX(t.getX()*20);
+            newcam.setY(t.getY()*20);
+            newcam.setZ(t.getZ()*20);
+            if(newcam.getWall() == 2)
+            {
+                point cam_hc = new point(newcam.getX(),newroom.getWidth(),newcam.getZ());
+                point hc1 = new point(newcam.getX()-newroom.getWidth()*Math.tan(Math.toRadians(newcam.getAngle1())/2),newroom.getWidth(),newcam.getZ());
+                point hc2 = new point(newcam.getX(),newroom.getWidth(),newcam.getZ() - newroom.getWidth()*Math.tan(Math.toRadians(newcam.getAngle2())/2));
+                point td = new point((hc1.getX()+hc2.getX())/2,(hc1.getY()+hc2.getY())/2,(hc1.getZ()+hc2.getZ())/2);
+                System.out.println(td.getX() +" "+ td.getZ());
+                point diemdau = new point(2*td.getX()-cam_hc.getX(),2*td.getY()-cam_hc.getY(),2*td.getZ()-cam_hc.getZ());
+                double w = newroom.getWidth()*Math.tan(Math.toRadians(newcam.getAngle1())/2) * 2;
+                double h = newroom.getWidth()*Math.tan(Math.toRadians(newcam.getAngle2())/2) * 2;
+                Area camera = new Area(new Rectangle2D.Double(diemdau.getY(), diemdau.getZ(), w, h));
+                areacBtoF = camera;
+                point cam_p = new point(newcam.getX(),newcam.getY(),newcam.getZ());
+                
+                for(Obstacle vat: listvat)
+                {
+                    point pa = new point(vat.getBottom1().get(0)*20,vat.getBottom1().get(1)*20,vat.getBottom1().get(2)*20);
+                    point pb = new point();
+                    System.out.println(pa.getX()+" "+pa.getY()+" "+pa.getZ());
+                    pb.setY(newroom.getWidth());
+                    double k = (pa.getY()-cam_p.getY())/(pb.getY()-cam_p.getY());
+                    System.out.println("k = "+k);
+                    pb.setX((((pa.getX()-cam_p.getX())/k)+cam_p.getX()));
+                    pb.setZ((((pa.getZ()-cam_p.getZ())/k)+cam_p.getZ()));
+                    System.out.println(pb.getX()+" "+pb.getY()+" "+pb.getZ());
+                    double w1 = Math.abs(vat.getBottom3().get(0) - vat.getBottom4().get(0));
+                    double h1 = Math.abs(vat.getTop1().get(2) - vat.getBottom1().get(2));
+                    double w_hc = w1/k *20;
+                    double h_hc = h1/k *20;
+                    
+                    point dx = new point(pb.getX(),newroom.getWidth(),newroom.getHeight()/2);
+
+                    point dx1 = new point(2*dx.getX()-pb.getX(),2*dx.getY()-pb.getY(),2*dx.getZ()-pb.getZ());
+                    System.out.println(dx1.getX() +" "+ dx1.getY()+" "+ dx1.getZ()+" "+w_hc+" "+h_hc);
+                    areavBtoF.add(new Area(new Rectangle2D.Double(dx1.getX(), dx1.getZ()-h_hc, w_hc, h_hc)));
+
+
+//                    break;
+                }
+//                System.out.println(y +" "+z);
+                
+            }
+        }
         JFrame cam = new JFrame();
-        CamBtoF g1 = new CamBtoF();
-        cam.setSize(800, 800);
+        if(areavBtoF.size()!=0)
+        {
+           System.out.println("FtoB");
+           cam.setVisible(true);
+           CamBtoF g1 = new CamBtoF(areavBtoF,areacBtoF);
+           cam.add(g1);
+//           g1.areavat = new ArrayList<>();
+//           g1.areavat.addAll(areavRtoL);
+//           System.out.println(g1.areavat.size());
+//           g1.areacam = areacRtoL;
+       }
+       
+       else 
+       {
+           JOptionPane.showMessageDialog(cam,"There is no camera on this wall!","No Camera",JOptionPane.WARNING_MESSAGE);
+           System.out.println("ko co cam");
+       }
+       cam.setSize(800,600);
         cam.setTitle("Camera");
         cam.setLocationRelativeTo(null);
-        cam.add(g1);
-        cam.setVisible(true);
     }//GEN-LAST:event_jButton5MouseClicked
 
     /**
