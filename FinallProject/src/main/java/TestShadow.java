@@ -10,7 +10,8 @@ public class TestShadow {
     public ArrayList<Node> result;
     public final double P_INFINITE = 1000000.0;
     public final double N_INFINITE = -1000000.0;
-    public final double LIMIT = 400.0;
+    public final double LIMIT_DOC = 200.0;
+    public final double LIMIT_NGANG = 400.0;
 
     public ArrayList<Node> solve(ArrayList<Rectangle> r, Node from)
     {
@@ -20,8 +21,8 @@ public class TestShadow {
         tmp = new ArrayList<>();
         result = new ArrayList<>();
 
-        Node base_line_left = new Node(N_INFINITE, LIMIT);
-        Node base_line_right = new Node(P_INFINITE, LIMIT);
+        Node base_line_left = new Node(N_INFINITE, LIMIT_DOC);
+        Node base_line_right = new Node(P_INFINITE, LIMIT_DOC);
         Line base_line = new Line(base_line_left, base_line_right);
 
         for (Rectangle rect : rects)
@@ -39,15 +40,15 @@ public class TestShadow {
         }
 
         //get limit
-        double left_limit = from.x - Math.tan(angle / 2) * LIMIT;
-        double right_limit = from.x + Math.tan(angle / 2) * LIMIT;
+        double left_limit = from.x - Math.tan(angle / 2) * LIMIT_DOC;
+        double right_limit = from.x + Math.tan(angle / 2) * LIMIT_DOC;
 
-        Node left_node_limit_original = new Node(left_limit, LIMIT);
-        Node left_node_limit1 = new Node(left_limit, LIMIT);
-        Node left_node_limit2 = new Node(left_limit, LIMIT);
-        Node right_node_limit_original = new Node(right_limit, LIMIT);
-        Node right_node_limit1 = new Node(right_limit, LIMIT);
-        Node right_node_limit2 = new Node(right_limit, LIMIT);
+        Node left_node_limit_original = new Node(left_limit, LIMIT_DOC);
+        Node left_node_limit1 = new Node(left_limit, LIMIT_DOC);
+        Node left_node_limit2 = new Node(left_limit, LIMIT_DOC);
+        Node right_node_limit_original = new Node(right_limit, LIMIT_DOC);
+        Node right_node_limit1 = new Node(right_limit, LIMIT_DOC);
+        Node right_node_limit2 = new Node(right_limit, LIMIT_DOC);
 
         for (Line line : lines_horizon)
         {
@@ -122,8 +123,8 @@ public class TestShadow {
         tmp.add(left_node_limit_original);
         tmp.add(right_node_limit_original);
 
-//        left_node_limit_original.getNode();
-//        right_node_limit_original.getNode();
+        left_node_limit_original.getNode();
+        right_node_limit_original.getNode();
 
         for (Line line : lines_horizon)
         {
@@ -210,18 +211,20 @@ public class TestShadow {
 //                System.out.println(beCovered);
                 if(!beCovered && line.right.coefficient < left_node_limit_original.coefficient
                         && line.right.coefficient > right_node_limit_original.coefficient)
-                    line.right.isLeft = false;
+                {
                     tmp.add(line.right);
+                    line.right.isLeft = false;
+                }
             }
         }
 
-        Collections.sort(tmp);
 
         for (Node node : tmp)
         {
             node.getNode();
         }
 
+        Collections.sort(tmp);
         result.add(left_node_limit_original);
 
         for (Node node : tmp)
@@ -230,7 +233,7 @@ public class TestShadow {
             if(node != left_node_limit_original && node != right_node_limit_original)
             {
                 Node possible_node = node.scaleUp(from, base_line);
-                double possible_Y = LIMIT;
+                double possible_Y = LIMIT_DOC;
 
                 for (Line line : lines_horizon)
                 {
@@ -256,7 +259,7 @@ public class TestShadow {
                         if((imagine_node.y >= line.left.y) && (imagine_node.y <= line.right.y))
                         {
                             if((imagine_node.x >= possible_node.x && imagine_node.x <= from.x)
-                            || (imagine_node.x <= possible_node.x && imagine_node.x >= from.x))
+                                    || (imagine_node.x <= possible_node.x && imagine_node.x >= from.x))
                             {
                                 possible_node = imagine_node;
                             }
@@ -290,8 +293,8 @@ public class TestShadow {
         tmp = new ArrayList<>();
         result = new ArrayList<>();
 
-        Node base_line_left = new Node(N_INFINITE, LIMIT);
-        Node base_line_right = new Node(P_INFINITE, LIMIT);
+        Node base_line_left = new Node(LIMIT_NGANG, N_INFINITE);
+        Node base_line_right = new Node(LIMIT_NGANG, P_INFINITE);
         Line base_line = new Line(base_line_left, base_line_right);
 
         for (Rectangle rect : rects)
@@ -309,16 +312,16 @@ public class TestShadow {
         }
 
         //get limit
-        double left_limit = from.y - Math.tan(angle / 2) * LIMIT;
-        double right_limit = from.y + Math.tan(angle / 2) * LIMIT;
+        double left_limit = from.y - Math.tan(angle / 2) * LIMIT_NGANG;
+        double right_limit = from.y + Math.tan(angle / 2) * LIMIT_NGANG;
 
-        Node left_node_limit_original = new Node(left_limit, LIMIT);
-        Node left_node_limit1 = new Node(LIMIT, left_limit);
-        Node left_node_limit2 = new Node(LIMIT, left_limit);
+        Node left_node_limit_original = new Node(left_limit, LIMIT_NGANG);
+        Node left_node_limit1 = new Node(LIMIT_NGANG, left_limit);
+        Node left_node_limit2 = new Node(LIMIT_NGANG, left_limit);
 //        left_node_limit1.getNode();
-        Node right_node_limit_original = new Node(right_limit, LIMIT);
-        Node right_node_limit1 = new Node(LIMIT, right_limit);
-        Node right_node_limit2 = new Node(LIMIT, right_limit);
+        Node right_node_limit_original = new Node(right_limit, LIMIT_NGANG);
+        Node right_node_limit1 = new Node(LIMIT_NGANG, right_limit);
+        Node right_node_limit2 = new Node(LIMIT_NGANG, right_limit);
 //        right_node_limit1.getNode();
         for (Line line : lines_horizon)
         {
@@ -431,6 +434,7 @@ public class TestShadow {
                         && line.left.coefficient > right_node_limit_original.coefficient)
                 {
                     tmp.add(line.left);
+                    line.left.isLeft = true;
                 }
             }
             for (Line line_ : lines_horizon)
@@ -476,16 +480,21 @@ public class TestShadow {
 //                System.out.println(beCovered);
                 if(!beCovered && line.right.coefficient < left_node_limit_original.coefficient
                         && line.right.coefficient > right_node_limit_original.coefficient)
+                {
                     tmp.add(line.right);
+                    line.right.isLeft = false;
+                }
             }
         }
 
         Collections.sort(tmp);
 
-//        for (Node node : tmp)
-//        {
-//            node.getNode();
-//        }
+        for (Node node : tmp)
+        {
+            node.getNode();
+        }
+
+        System.out.println("enddddd");
 
         result.add(left_node_limit_original);
 
@@ -495,7 +504,7 @@ public class TestShadow {
             if(node != left_node_limit_original && node != right_node_limit_original)
             {
                 Node possible_node = node.scaleUp(from, base_line);
-                double possible_X = LIMIT;
+                double possible_X = LIMIT_NGANG;
 
                 for (Line line : lines_horizon)
                 {

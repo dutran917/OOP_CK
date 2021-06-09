@@ -36,6 +36,16 @@ public class Node implements Comparable<Node> {
         }
     }
 
+    public Node xSymmetric(double axis)
+    {
+        return new Node(x, axis * 2 - y);
+    }
+
+    public Node ySymmetric(double axis)
+    {
+        return new Node(axis * 2 - x, y);
+    }
+    //C:\Users\Admin\Desktop\input.txt
     public void getNode()
     {
         System.out.println(this.x + " " + this.y + " " + this.coefficient);

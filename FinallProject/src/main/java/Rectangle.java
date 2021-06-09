@@ -30,4 +30,24 @@ public class Rectangle {
         line3 = new Line(node4, node1);
         line4 = new Line(node3, node2);
     }
+
+    public Rectangle xSymmetric(double axis)
+    {
+        Node node1_ = line3.left.xSymmetric(axis);
+        Node node2_ = line4.left.xSymmetric(axis);
+        Node node3_ = line4.right.xSymmetric(axis);
+        Node node4_ = line3.right.xSymmetric(axis);
+
+        return new Rectangle(node1_, node2_, node3_, node4_);
+    }
+
+    public Rectangle ySymmetric(double axis)
+    {
+        Node node1_ = line1.right.ySymmetric(axis);
+        Node node2_ = line1.left.ySymmetric(axis);
+        Node node3_ = line2.left.ySymmetric(axis);
+        Node node4_ = line2.right.ySymmetric(axis);
+
+        return new Rectangle(node1_, node2_, node3_, node4_);
+    }
 }

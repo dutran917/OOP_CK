@@ -19,25 +19,26 @@ import javax.swing.JPanel;
 public class CamFtoB extends JPanel{
     ArrayList<Area> areavat;
     Area areacam;
-    public CamFtoB(ArrayList<Area> area1,Area area2)
-    {
-        this.areavat = area1;
-        this.areacam = area2;
-    }
+//    public CamFtoB(ArrayList<Area> area1,Area area2)
+//    {
+//        this.areavat = area1;
+//        this.areacam = area2;
+//    }
     public void paintComponent(Graphics g)
     {
         super.paintComponent(g);
         this.setBackground(Color.black);
+
         Graphics2D g2d = (Graphics2D) g;
-        Area cam_tmp=(Area)areacam.clone();
+        g2d.setColor(Color.WHITE);
+        g2d.fill(areacam);
+        randomcolor a =new randomcolor();
         for(Area t: areavat)
         {
-            areacam.subtract(t);
-            g2d.setColor(Color.red);
+            g2d.setColor(a.randomColor());
+            t.intersect(areacam);
             g2d.fill(t);
         }
-        System.out.println(areavat.size()+"+++++++++++");
-        g2d.setColor(Color.white);
-        g2d.fill(areacam);
+        
     }     
 }

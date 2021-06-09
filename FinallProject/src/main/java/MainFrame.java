@@ -1,6 +1,7 @@
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -57,14 +58,16 @@ public class MainFrame extends javax.swing.JFrame {
             int numberOfObs = Integer.parseInt(string);
             
             //Tạo các vật
+            ArrayList<Obstacle> obstacles = new ArrayList<>();
             for(int i = 0 ; i < numberOfObs; i++){
                 string = scanner.nextLine();
                 //System.out.println(string);
                 str = string.substring(1, string.length()-1);
                 Obstacle obs = createObs(str);
-                listObstacles.add(obs);
+                obstacles.add(obs);
                 newRoom.addObstacle(obs);
             }
+            listObstacles = obstacles;
             
             //Lấy số lượng camera
             string = scanner.nextLine();
@@ -72,16 +75,20 @@ public class MainFrame extends javax.swing.JFrame {
             int numberOfCameras = Integer.parseInt(string);
             
             //Tạo camera
+            ArrayList<Camera> cameras = new ArrayList<>();
             for(int i = 0; i < numberOfCameras; i++){
                 string = scanner.nextLine();
                 //System.out.println(string);
                 str = string.substring(1);
                 Camera camera = createCamera(str);
-                listCameras.add(camera);
+                cameras.add(camera);
                 newRoom.addCamera(camera);
             }
+            listCameras = cameras;
             
-            JOptionPane.showMessageDialog(null, "Scan successful", "", JOptionPane.INFORMATION_MESSAGE);
+            double rate = newRoom.RateOfSighting() * 100;
+            String optimalString = String.format("Tỷ lệ thể tích vật nhìn thấy được: %.2f", rate) + "%";
+            JOptionPane.showMessageDialog(null, optimalString, "Scan successful", JOptionPane.INFORMATION_MESSAGE);
                         
         } catch (FileNotFoundException ex) {
             JOptionPane.showMessageDialog(null, ex.toString(), "",JOptionPane.ERROR_MESSAGE);
@@ -117,8 +124,6 @@ public class MainFrame extends javax.swing.JFrame {
         }
         
         return new Room(l, w, h);
-        
-        
     }
     
     public Obstacle createObs(String str){
@@ -223,6 +228,7 @@ public class MainFrame extends javax.swing.JFrame {
        double[] y = {b1.get(1), b2.get(1), b3.get(1), b4.get(1), t1.get(1), t2.get(1), t3.get(1), t4.get(1)};
        double[] z = {b1.get(2), b2.get(2), b3.get(2), b4.get(2), t1.get(2), t2.get(2), t3.get(2), t4.get(2)};
         
+
        
        return new Obstacle(x,y,z);
 
@@ -303,6 +309,14 @@ public class MainFrame extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         resultTextArea = new javax.swing.JTextArea();
         btnReturn4 = new javax.swing.JButton();
+        inforPanel = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -406,13 +420,13 @@ public class MainFrame extends javax.swing.JFrame {
         createPanelLayout.setVerticalGroup(
             createPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, createPanelLayout.createSequentialGroup()
-                .addGap(67, 67, 67)
+                .addGap(82, 82, 82)
                 .addGroup(createPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(fileInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(69, 69, 69)
+                .addGap(87, 87, 87)
                 .addComponent(btnScan)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 79, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 88, Short.MAX_VALUE)
                 .addGroup(createPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnNext1)
                     .addComponent(btnReturn1))
@@ -423,9 +437,9 @@ public class MainFrame extends javax.swing.JFrame {
 
         btnDrawSlideshow.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         btnDrawSlideshow.setText("Draw Slideshow");
-        btnDrawSlideshow.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                btnDrawSlideshowMouseClicked(evt);
+        btnDrawSlideshow.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDrawSlideshowActionPerformed(evt);
             }
         });
 
@@ -467,9 +481,9 @@ public class MainFrame extends javax.swing.JFrame {
                 .addComponent(btnDrawSlideshow)
                 .addGap(74, 74, 74)
                 .addComponent(btnOptimal)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 67, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 79, Short.MAX_VALUE)
                 .addComponent(btnReturn2)
-                .addGap(78, 78, 78))
+                .addGap(72, 72, 72))
         );
 
         optimalPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -528,17 +542,17 @@ public class MainFrame extends javax.swing.JFrame {
         optimalPanelLayout.setVerticalGroup(
             optimalPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(optimalPanelLayout.createSequentialGroup()
-                .addGap(78, 78, 78)
+                .addGap(69, 69, 69)
                 .addGroup(optimalPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(numberCameraTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 86, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 62, Short.MAX_VALUE)
                 .addComponent(btnCamera)
-                .addGap(65, 65, 65)
+                .addGap(56, 56, 56)
                 .addComponent(btnReEnterCamera)
-                .addGap(50, 50, 50)
+                .addGap(41, 41, 41)
                 .addComponent(btnReturn3)
-                .addGap(62, 62, 62))
+                .addGap(47, 47, 47))
         );
 
         resultPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -581,9 +595,74 @@ public class MainFrame extends javax.swing.JFrame {
                 .addComponent(jLabel4)
                 .addGap(27, 27, 27)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(59, 59, 59)
+                .addGap(65, 65, 65)
                 .addComponent(btnReturn4)
-                .addContainerGap(53, Short.MAX_VALUE))
+                .addContainerGap(77, Short.MAX_VALUE))
+        );
+
+        inforPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabel3.setText("Team 1");
+
+        jLabel6.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabel6.setText("Leader:");
+
+        jLabel7.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabel7.setText("Member:");
+
+        jLabel8.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabel8.setText("Nguyễn Xuân Nghĩa");
+
+        jLabel9.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabel9.setText("Trần Quốc Du");
+
+        jLabel10.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabel10.setText("Hoàng Ngọc Bảo");
+
+        jLabel11.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabel11.setText("Trịnh Tiến Đạt");
+
+        javax.swing.GroupLayout inforPanelLayout = new javax.swing.GroupLayout(inforPanel);
+        inforPanel.setLayout(inforPanelLayout);
+        inforPanelLayout.setHorizontalGroup(
+            inforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, inforPanelLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel3)
+                .addGap(453, 453, 453))
+            .addGroup(inforPanelLayout.createSequentialGroup()
+                .addGap(317, 317, 317)
+                .addGroup(inforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel6)
+                    .addComponent(jLabel7))
+                .addGap(101, 101, 101)
+                .addGroup(inforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
+                    .addGroup(inforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
+                        .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        inforPanelLayout.setVerticalGroup(
+            inforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(inforPanelLayout.createSequentialGroup()
+                .addGap(54, 54, 54)
+                .addComponent(jLabel3)
+                .addGap(48, 48, 48)
+                .addGroup(inforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel6)
+                    .addComponent(jLabel8))
+                .addGap(46, 46, 46)
+                .addGroup(inforPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel7)
+                    .addComponent(jLabel9))
+                .addGap(29, 29, 29)
+                .addComponent(jLabel10)
+                .addGap(30, 30, 30)
+                .addComponent(jLabel11)
+                .addContainerGap(43, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -595,6 +674,7 @@ public class MainFrame extends javax.swing.JFrame {
             .addComponent(optionPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(optimalPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(resultPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(inforPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -608,7 +688,9 @@ public class MainFrame extends javax.swing.JFrame {
                 .addComponent(optimalPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(resultPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(653, 653, 653))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(inforPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(714, 714, 714))
         );
 
         pack();
@@ -632,31 +714,13 @@ public class MainFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "You dont enter the input file address", "", JOptionPane.ERROR_MESSAGE);
         else
             createParameters(fileAddress);
-        System.out.println(newRoom.getLength() + " " + newRoom.getWidth() + " " + newRoom.getHeight());
-        for(Obstacle obs : listObstacles){
-            System.out.println(obs.getBottom1());
-            System.out.println(obs.getBottom2());
-            System.out.println(obs.getBottom3());
-            System.out.println(obs.getBottom4());
-            System.out.println(obs.getTop1());
-            System.out.println(obs.getTop2());
-            System.out.println(obs.getTop3());
-            System.out.println(obs.getTop4());
-            System.out.println();
-        }
-        for(Camera cam : listCameras){
-            System.out.println(cam.getX() + " " + cam.getY() + " " + cam.getZ() + " " + cam.getAngle1() + " " + cam.getAngle2());
-            System.out.println();
-        }        
     }//GEN-LAST:event_btnScanActionPerformed
 
     private void btnReturn1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReturn1ActionPerformed
         // TODO add your handling code here:
         startPanel.setVisible(true);
         createPanel.setVisible(false);
-        newRoom = null;
-        listCameras.removeAll(listCameras);
-        listObstacles.removeAll(listObstacles);
+        
     }//GEN-LAST:event_btnReturn1ActionPerformed
 
     private void btnNext1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNext1ActionPerformed
@@ -673,9 +737,11 @@ public class MainFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
         createPanel.setVisible(true);
         optionPanel.setVisible(false);
-        newRoom = null;
-        listCameras.removeAll(listCameras);
-        listObstacles.removeAll(listObstacles);
+//        newRoom = null;
+//        //listCameras.removeAll(listCameras);
+//        //listObstacles.removeAll(listObstacles);
+//        listCameras = null;
+//        listObstacles = null;
     }//GEN-LAST:event_btnReturn2ActionPerformed
 
     private void btnReturn3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReturn3ActionPerformed
@@ -718,11 +784,11 @@ public class MainFrame extends javax.swing.JFrame {
         resetRoom();
     }//GEN-LAST:event_btnReturn4ActionPerformed
 
-    private void btnDrawSlideshowMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnDrawSlideshowMouseClicked
+    private void btnDrawSlideshowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDrawSlideshowActionPerformed
         // TODO add your handling code here:
-        Hinhchieu hc = new Hinhchieu(newRoom,listCameras,listObstacles);
+        Hinhchieu hc = new Hinhchieu(newRoom, listCameras, listObstacles);
         hc.setVisible(true);
-    }//GEN-LAST:event_btnDrawSlideshowMouseClicked
+    }//GEN-LAST:event_btnDrawSlideshowActionPerformed
 
     /**
      * @param args the command line arguments
@@ -774,10 +840,18 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JButton btnStart;
     private javax.swing.JPanel createPanel;
     private javax.swing.JTextField fileInput;
+    private javax.swing.JPanel inforPanel;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField numberCameraTF;
     private javax.swing.JPanel optimalPanel;
